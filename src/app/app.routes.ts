@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { PlacesPage } from './places/places.page';
 
 export const routes: Routes = [
   {
@@ -8,8 +9,7 @@ export const routes: Routes = [
   },
   {
     path: 'places',
-    loadComponent: () =>
-      import('./places/places.page').then((m) => m.PlacesPage),
+    component: PlacesPage,
 
     children: [
       {
@@ -30,29 +30,29 @@ export const routes: Routes = [
         path: 'offers',
         loadComponent: () =>
           import('./places/offers/offers.page').then((m) => m.OffersPage),
-        // children: [
-        //   {
-        //     path: 'new',
-        //     loadComponent: () =>
-        //       import('./places/offers/new-offer/new-offer.page').then(
-        //         (m) => m.NewOfferPage
-        //       ),
-        //   },
-        //   {
-        //     path: 'edit/:placeId',
-        //     loadComponent: () =>
-        //       import('./places/offers/edit-offer/edit-offer.page').then(
-        //         (m) => m.EditOfferPage
-        //       ),
-        //   },
-        //   {
-        //     path: ':placeId',
-        //     loadComponent: () =>
-        //       import('./places/offers/offer-bookings/offer-bookings.page').then(
-        //         (m) => m.OfferBookingsPage
-        //       ),
-        //   },
-        // ],
+        children: [
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('./places/offers/new-offer/new-offer.page').then(
+                (m) => m.NewOfferPage
+              ),
+          },
+          {
+            path: 'edit/:placeId',
+            loadComponent: () =>
+              import('./places/offers/edit-offer/edit-offer.page').then(
+                (m) => m.EditOfferPage
+              ),
+          },
+          {
+            path: ':placeId',
+            loadComponent: () =>
+              import('./places/offers/offer-bookings/offer-bookings.page').then(
+                (m) => m.OfferBookingsPage
+              ),
+          },
+        ],
       },
     ],
   },
