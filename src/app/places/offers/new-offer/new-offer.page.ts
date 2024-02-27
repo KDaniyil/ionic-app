@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -8,13 +8,8 @@ import { IonicModule } from '@ionic/angular';
   templateUrl: './new-offer.page.html',
   styleUrls: ['./new-offer.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule],
 })
-export class NewOfferPage implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class NewOfferPage {
+  constructor() {}
 }
