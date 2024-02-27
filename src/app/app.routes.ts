@@ -16,15 +16,13 @@ export const routes: Routes = [
         path: 'discover',
         loadComponent: () =>
           import('./places/discover/discover.page').then((m) => m.DiscoverPage),
-        children: [
-          {
-            path: ':placeId',
-            loadComponent: () =>
-              import('./places/discover/place-detail/place-detail.page').then(
-                (m) => m.PlaceDetailPage
-              ),
-          },
-        ],
+      },
+      {
+        path: 'discover/:placeId',
+        loadComponent: () =>
+          import('./places/discover/place-detail/place-detail.page').then(
+            (m) => m.PlaceDetailPage
+          ),
       },
       {
         path: 'offers',
