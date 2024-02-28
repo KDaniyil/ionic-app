@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { business, checkbox, exit } from 'ionicons/icons';
@@ -7,10 +8,11 @@ import { business, checkbox, exit } from 'ionicons/icons';
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonicModule, RouterLink],
 })
 export class AppComponent {
   constructor() {
     addIcons({ business, checkbox, exit });
   }
+  onLogout() {}
 }
