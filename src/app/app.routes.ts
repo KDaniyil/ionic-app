@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { PlacesPage } from './places/places.page';
+import { AuthGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   {
@@ -9,8 +10,8 @@ export const routes: Routes = [
   },
   {
     path: 'places',
+    canActivate: [AuthGuard],
     component: PlacesPage,
-
     children: [
       {
         path: 'discover',
