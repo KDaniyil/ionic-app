@@ -1,10 +1,13 @@
 // Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/theming/
-
+.ios {
+  --ion-color-primary: #036307;
+}
 /** Ionic CSS Variables **/
 :root {
+  
   /** primary **/
-  --ion-color-primary: #3880ff;
+  --ion-color-primary: #041636;
   --ion-color-primary-rgb: 56, 128, 255;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
@@ -83,7 +86,7 @@
    */
 
   body {
-    --ion-color-primary: #428cff;
+    --ion-color-primary: #688fcd;
     --ion-color-primary-rgb: 66,140,255;
     --ion-color-primary-contrast: #ffffff;
     --ion-color-primary-contrast-rgb: 255,255,255;
@@ -232,7 +235,9 @@
     --ion-tab-bar-background: #1f1f1f;
 
     --ion-card-background: #1e1e1e;
+    --ion-toolbar-background: var(--ion-color-primary);
   }
+  
 }
 
 html {

@@ -6,13 +6,14 @@ import { BookingService } from './booking.service';
 import { Booking } from './booking.modelts';
 import { addIcons } from 'ionicons';
 import { trash } from 'ionicons/icons';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-bookings',
   templateUrl: './bookings.page.html',
   styleUrls: ['./bookings.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, ScrollingModule],
 })
 export class BookingsPage implements OnInit {
   bookings: Booking[] = [];

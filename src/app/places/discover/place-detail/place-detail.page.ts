@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, NavController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  IonicModule,
+  NavController,
+} from '@ionic/angular';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { Place } from '../../place.model';
@@ -22,7 +26,8 @@ export class PlaceDetailPage implements OnInit {
     private navCtrl: NavController,
     private route: ActivatedRoute,
     private placesService: PlacesService,
-    private modalCntr: ModalController
+    private modalCntr: ModalController,
+    private actionSheetCntrl: ActionSheetController
   ) {}
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
@@ -36,6 +41,39 @@ export class PlaceDetailPage implements OnInit {
   }
 
   onBookPlace() {
+    this.actionSheetCntrl
+      .create({
+        header: 'Choose an Action',
+        buttons: [
+          {
+            text: 'Select Date',
+            handler: () => {
+              this.openBookingModal('select');
+            },
+          },
+          {
+            text: 'Random Date',
+            handler: () => {
+              this.openBookingModal('random');
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+        ],
+      })
+      .then((actionSheetEl) => {
+        actionSheetEl.present();
+      });
+
+    //this.router.navigateByUrl('/places/discover');
+    //this.navCtrl.navigateBack('/places/discover');
+    //this.navCtrl.pop();
+  }
+
+  openBookingModal(mode: 'select' | 'random') {
+    console.log(mode);
     this.modalCntr
       .create({
         component: CreateBookingComponent,
@@ -52,8 +90,5 @@ export class PlaceDetailPage implements OnInit {
           console.log('BOOKED!');
         }
       });
-    //this.router.navigateByUrl('/places/discover');
-    //this.navCtrl.navigateBack('/places/discover');
-    //this.navCtrl.pop();
   }
 }
