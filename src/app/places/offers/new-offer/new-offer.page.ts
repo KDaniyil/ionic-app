@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, LoadingController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark } from 'ionicons/icons';
 import { PlacesService } from '../../places.service';
@@ -22,7 +22,11 @@ import { Router } from '@angular/router';
 })
 export class NewOfferPage implements OnInit {
   form!: FormGroup;
-  constructor(private placesService: PlacesService, private router: Router) {
+  constructor(
+    private placesService: PlacesService,
+    private router: Router,
+    private loadngCtrl: LoadingController
+  ) {
     addIcons({ checkmark });
   }
   ngOnInit(): void {
@@ -54,14 +58,26 @@ export class NewOfferPage implements OnInit {
     if (!this.form.valid) {
       return;
     }
-    this.placesService.addPlaces(
-      this.form.value.title,
-      this.form.value.description,
-      +this.form.value.price,
-      new Date(this.form.value.dateFrom),
-      new Date(this.form.value.dateTo)
-    );
-    this.form.reset();
-    this.router.navigate(['/places/offers']);
+    this.loadngCtrl
+      .create({
+        message: 'Creating place...',
+      })
+      .then((loadingEl) => {
+        loadingEl.present();
+
+        this.placesService
+          .addPlaces(
+            this.form.value.title,
+            this.form.value.description,
+            +this.form.value.price,
+            new Date(this.form.value.dateFrom),
+            new Date(this.form.value.dateTo)
+          )
+          .subscribe(() => {
+            loadingEl.dismiss();
+            this.form.reset();
+            this.router.navigate(['/places/offers']);
+          });
+      });
   }
 }

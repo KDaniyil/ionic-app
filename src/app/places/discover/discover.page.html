@@ -17,26 +17,34 @@
       <ion-label>Bookable Places</ion-label>
     </ion-segment-button>
   </ion-segment>
-  <ion-grid>
+  <ion-grid *ngIf="!relevantPlaces || relevantPlaces.length <= 0">
+    <ion-row>
+      <ion-col size="12" sizeSm="8" offsetSm="2" class="ion-text-center">
+        <p>There are no bookable places right now, please come back later</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="relevantPlaces.length > 0">
     <ion-row>
       <ion-col size="12" sizeSm="8" offsetSm="2" class="ion-text-center">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>{{places[0].title}}</ion-card-title>
+            <ion-card-title>{{relevantPlaces[0]?.title}}</ion-card-title>
             <ion-card-subtitle
-              >{{places[0].price | currency}} / Night</ion-card-subtitle
+              >{{relevantPlaces[0]?.price | currency}} /
+              Night</ion-card-subtitle
             >
           </ion-card-header>
-          <ion-img [src]="places[0].imageUrl"></ion-img>
+          <ion-img [src]="relevantPlaces[0]?.imageUrl"></ion-img>
           <ion-card-content>
-            <p>{{places[0].description}}</p>
+            <p>{{relevantPlaces[0]?.description}}</p>
           </ion-card-content>
           <div>
             <ion-button
               fill="clear"
               color="primary"
               routerDirection="forward"
-              [routerLink]="['/places/discover', places[0].id]"
+              [routerLink]="['/places/discover', relevantPlaces[0]?.id]"
             >
               More
             </ion-button>
@@ -50,15 +58,15 @@
           <ion-list>
             <ion-item
               *cdkVirtualFor="let place of placesToScroll"
-              [routerLink]="['/places/discover', place.id]"
+              [routerLink]="['/places/discover', place?.id]"
               detail
             >
               <ion-thumbnail slot="start">
-                <ion-img [src]="place.imageUrl"></ion-img>
+                <ion-img [src]="place?.imageUrl"></ion-img>
               </ion-thumbnail>
               <ion-label>
-                <h2>{{place.title}}</h2>
-                <h3>{{place.description}}</h3>
+                <h2>{{place?.title}}</h2>
+                <h3>{{place?.description}}</h3>
               </ion-label>
             </ion-item>
           </ion-list>

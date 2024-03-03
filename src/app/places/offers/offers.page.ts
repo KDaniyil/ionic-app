@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -26,14 +26,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class OffersPage implements OnInit {
   offers: Place[] = [];
-
+  destroyRef = inject(DestroyRef);
   constructor(private placesService: PlacesService, private router: Router) {
     addIcons({ add, create, calendar });
   }
 
   ngOnInit() {
     this.placesService.places
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((places) => (this.offers = places));
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -16,6 +16,8 @@ import {
   ScrollingModule,
 } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-discover',
@@ -36,22 +38,36 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class DiscoverPage implements OnInit {
   places: Place[] = [];
   placesToScroll: Place[] = [];
+  destroyRef = inject(DestroyRef);
+  relevantPlaces: Place[] = [];
   constructor(
     private placesService: PlacesService,
-    private menu: MenuController
+    private menu: MenuController,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.placesService.places.pipe(takeUntilDestroyed()).subscribe((places) => {
-      this.places = places as Place[];
-      this.placesToScroll = [...this.places.slice(1)];
-    });
+    this.placesService.places
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((places) => {
+        this.places = places as Place[];
+        this.placesToScroll = [...this.places.slice(1)];
+        this.relevantPlaces = this.places.slice(1);
+      });
   }
   onOpenMenu() {
     this.menu.open('m1');
   }
 
   onFilter(event: CustomEvent<SegmentChangeEventDetail>) {
-    console.log(event.detail);
+    if (event.detail.value === 'all') {
+      this.relevantPlaces = this.places;
+      this.placesToScroll = this.relevantPlaces.slice(1);
+    } else {
+      this.relevantPlaces = this.places.filter(
+        (place) => place.userId !== this.authService.userId
+      );
+      this.placesToScroll = this.relevantPlaces.slice(1);
+    }
   }
 }
