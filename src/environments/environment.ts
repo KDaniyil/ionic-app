@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  ApiUrl: 'https://angular-ionic-4c352-default-rtdb.firebaseio.com/',
+  production: false,
 };
 
 /*

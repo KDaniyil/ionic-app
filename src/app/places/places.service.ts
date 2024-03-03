@@ -1,7 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Place } from './place.model';
 import { AuthService } from '../auth/auth.service';
-import { BehaviorSubject, delay, map, take, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  delay,
+  map,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +54,10 @@ export class PlacesService {
     return this._places.asObservable();
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private httpClient: HttpClient
+  ) {}
 
   getPlace(id: string) {
     return this.places.pipe(
@@ -81,13 +94,30 @@ export class PlacesService {
       dateTo,
       this.authService.userId
     );
-    return this.places.pipe(
-      take(1),
-      delay(2000),
-      tap((places) => {
-        this._places.next(places.concat(newPlace));
+    let newPlaceId: string;
+    this.httpClient
+      .post<{ name: string }>(`${environment.ApiUrl}/offered-places.json`, {
+        ...newPlace,
+        id: null,
       })
-    );
+      .pipe(
+        switchMap((resData) => {
+          newPlaceId = resData.name;
+          return this.places;
+        }),
+        take(1),
+        tap((places: Place[]) => {
+          newPlace.id = newPlaceId;
+          this._places.next(places.concat(newPlace));
+        })
+      );
+    // return this.places.pipe(
+    //   take(1),
+    //   delay(2000),
+    //   tap((places) => {
+    //     this._places.next(places.concat(newPlace));
+    //   })
+    // );
   }
 
   updateOffer(offerId: string, title: string, description: string) {
@@ -112,4 +142,9 @@ export class PlacesService {
       })
     );
   }
+}
+function swithMap(
+  arg0: (resData: any) => void
+): import('rxjs').OperatorFunction<{ name: string }, unknown> {
+  throw new Error('Function not implemented.');
 }
