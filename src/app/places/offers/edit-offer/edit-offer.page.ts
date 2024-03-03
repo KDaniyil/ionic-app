@@ -11,6 +11,7 @@ import { IonicModule, NavController } from '@ionic/angular';
 import { Place } from '../../place.model';
 import { ActivatedRoute } from '@angular/router';
 import { PlacesService } from '../../places.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-edit-offer',
@@ -34,17 +35,26 @@ export class EditOfferPage implements OnInit {
         this.navCtrl.navigateBack('/places/offers');
         return;
       }
-      this.place = this.placesService.getPlace(paramMap.get('placeId')!);
-      this.form = new FormGroup({
-        title: new FormControl(this.place.title, {
-          updateOn: 'blur',
-          validators: [Validators.required],
-        }),
-        description: new FormControl(this.place.description, {
-          updateOn: 'blur',
-          validators: [Validators.required, Validators.maxLength(180)],
-        }),
-      });
+      this.placesService
+        .getPlace(paramMap.get('placeId')!)
+        .pipe(takeUntilDestroyed())
+        .subscribe((place) => {
+          this.place = place;
+          this.initForm();
+        });
+    });
+  }
+
+  initForm() {
+    this.form = new FormGroup({
+      title: new FormControl(this.place.title, {
+        updateOn: 'blur',
+        validators: [Validators.required],
+      }),
+      description: new FormControl(this.place.description, {
+        updateOn: 'blur',
+        validators: [Validators.required, Validators.maxLength(180)],
+      }),
     });
   }
 

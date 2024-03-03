@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   ActionSheetController,
   IonicModule,
@@ -11,16 +11,18 @@ import { ModalController } from '@ionic/angular/standalone';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
 import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-booking.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-place-detail',
   templateUrl: './place-detail.page.html',
   styleUrls: ['./place-detail.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterLink],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, RouterLink],
 })
 export class PlaceDetailPage implements OnInit {
   place!: Place;
+  form!: FormGroup;
   constructor(
     private router: Router,
     private navCtrl: NavController,
@@ -36,7 +38,12 @@ export class PlaceDetailPage implements OnInit {
         return;
       }
       const placeId = paramMap.get('placeId');
-      this.place = this.placesService.getPlace(placeId!);
+      this.placesService
+        .getPlace(placeId!)
+        .pipe(takeUntilDestroyed())
+        .subscribe((place) => {
+          this.place = place;
+        });
     });
   }
 

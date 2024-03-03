@@ -15,6 +15,7 @@ import {
   CdkVirtualScrollViewport,
   ScrollingModule,
 } from '@angular/cdk/scrolling';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-discover',
@@ -41,12 +42,10 @@ export class DiscoverPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.places = this.placesService.places;
-    this.placesToScroll = [
-      ...this.placesService.places.slice(1),
-      ...this.placesService.places.slice(1),
-      ...this.placesService.places.slice(1),
-    ];
+    this.placesService.places.pipe(takeUntilDestroyed()).subscribe((places) => {
+      this.places = places as Place[];
+      this.placesToScroll = [...this.places.slice(1)];
+    });
   }
   onOpenMenu() {
     this.menu.open('m1');

@@ -5,6 +5,7 @@ import { IonicModule, NavController } from '@ionic/angular';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-offer-bookings',
@@ -27,7 +28,12 @@ export class OfferBookingsPage implements OnInit {
         this.navCtrl.navigateBack('/places/offers');
       }
       const placeId = param.get('placeId') || '';
-      this.offer = this.placesService.getPlace(placeId);
+      this.placesService
+        .getPlace(placeId)
+        .pipe(takeUntilDestroyed())
+        .subscribe((place) => {
+          this.offer = place as Place;
+        });
     });
   }
 }

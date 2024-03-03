@@ -9,6 +9,7 @@ import { PlacesService } from '../places.service';
 import { Place } from '../place.model';
 import { IonItemSliding } from '@ionic/angular';
 import { OfferItemComponent } from './offer-item/offer-item.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-offers',
@@ -31,7 +32,9 @@ export class OffersPage implements OnInit {
   }
 
   ngOnInit() {
-    this.offers = this.placesService.places;
+    this.placesService.places
+      .pipe(takeUntilDestroyed())
+      .subscribe((places) => (this.offers = places));
   }
 
   onEdit(offerId: string, slidingItem: IonItemSliding) {

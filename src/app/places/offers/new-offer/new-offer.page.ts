@@ -10,6 +10,8 @@ import {
 import { IonicModule } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { checkmark } from 'ionicons/icons';
+import { PlacesService } from '../../places.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-new-offer',
@@ -20,7 +22,7 @@ import { checkmark } from 'ionicons/icons';
 })
 export class NewOfferPage implements OnInit {
   form!: FormGroup;
-  constructor() {
+  constructor(private placesService: PlacesService, private router: Router) {
     addIcons({ checkmark });
   }
   ngOnInit(): void {
@@ -48,5 +50,18 @@ export class NewOfferPage implements OnInit {
     });
   }
 
-  onCreateOffer() {}
+  onCreateOffer() {
+    if (!this.form.valid) {
+      return;
+    }
+    this.placesService.addPlaces(
+      this.form.value.title,
+      this.form.value.description,
+      +this.form.value.price,
+      new Date(this.form.value.dateFrom),
+      new Date(this.form.value.dateTo)
+    );
+    this.form.reset();
+    this.router.navigate(['/places/offers']);
+  }
 }

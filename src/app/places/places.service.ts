@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Place } from './place.model';
+import { AuthService } from '../auth/auth.service';
+import { BehaviorSubject, map, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlacesService {
-  private _places: Place[] = [
+  private _places: BehaviorSubject<Place[]> = new BehaviorSubject<Place[]>([
     new Place(
       'p1',
       'Manhattan Mansion',
@@ -13,7 +15,8 @@ export class PlacesService {
       'https://th.bing.com/th/id/OIP.pL__it51_6AHLai_8CMtVwHaE8?w=260&h=180&c=7&r=0&o=5&pid=1.7',
       149.99,
       new Date('2022-01-01'),
-      new Date('2022-01-15')
+      new Date('2022-01-15'),
+      'abc'
     ),
     new Place(
       'p2',
@@ -22,7 +25,8 @@ export class PlacesService {
       'https://i.ytimg.com/vi/ja8V6pOcs_w/maxresdefault.jpg',
       189.99,
       new Date('2022-01-16'),
-      new Date('2022-01-31')
+      new Date('2022-01-31'),
+      'abc'
     ),
     new Place(
       'p3',
@@ -31,17 +35,54 @@ export class PlacesService {
       'https://th.bing.com/th/id/OIP.E6hmmllEEd-Slh4kJC5EgwHaE5?rs=1&pid=ImgDetMain',
       99.99,
       new Date('2022-02-01'),
-      new Date('2022-02-28')
+      new Date('2022-02-28'),
+      'abc'
     ),
-  ];
+  ]);
 
   get places() {
-    return [...this._places];
+    return this._places.asObservable();
   }
+
+  constructor(private authService: AuthService) {}
 
   getPlace(id: string) {
-    return { ...(this._places.find((p) => p.id === id)! as Place) };
+    return this.places.pipe(
+      take(1),
+      map((places: Place[]) => {
+        return { ...(this._places.value.find((p) => p.id === id)! as Place) };
+      })
+    );
+    //return { ...(this._places.value.find((p) => p.id === id)! as Place) };
   }
 
-  constructor() {}
+  /**
+   * funzione per aggiungere un nuovo posto
+   * @param title
+   * @param description
+   * @param price
+   * @param dateFrom
+   * @param dateTo
+   */
+  addPlaces(
+    title: string,
+    description: string,
+    price: number,
+    dateFrom: Date,
+    dateTo: Date
+  ) {
+    const newPlace = new Place(
+      Math.random().toString(),
+      title,
+      description,
+      'https://th.bing.com/th/id/OIP.pL__it51_6AHLai_8CMtVwHaE8?w=260&h=180&c=7&r=0&o=5&pid=1.7',
+      price,
+      dateFrom,
+      dateTo,
+      this.authService.userId
+    );
+    this.places.pipe(take(1)).subscribe((places) => {
+      this._places.next(places.concat(newPlace));
+    });
+  }
 }
