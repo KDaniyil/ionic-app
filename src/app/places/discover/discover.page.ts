@@ -40,6 +40,7 @@ export class DiscoverPage implements OnInit {
   placesToScroll: Place[] = [];
   destroyRef = inject(DestroyRef);
   relevantPlaces: Place[] = [];
+  isLoading = false;
   constructor(
     private placesService: PlacesService,
     private menu: MenuController,
@@ -55,6 +56,14 @@ export class DiscoverPage implements OnInit {
         this.relevantPlaces = this.places.slice(1);
       });
   }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.placesService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
+    });
+  }
+
   onOpenMenu() {
     this.menu.open('m1');
   }

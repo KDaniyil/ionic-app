@@ -27,6 +27,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class OffersPage implements OnInit {
   offers: Place[] = [];
   destroyRef = inject(DestroyRef);
+  isLoading = false;
   constructor(private placesService: PlacesService, private router: Router) {
     addIcons({ add, create, calendar });
   }
@@ -35,6 +36,13 @@ export class OffersPage implements OnInit {
     this.placesService.places
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((places) => (this.offers = places));
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.placesService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
+    });
   }
 
   onEdit(offerId: string, slidingItem: IonItemSliding) {

@@ -13,6 +13,16 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
+interface PlaceData {
+  availableFrom: string;
+  availableTo: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  title: string;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -59,6 +69,38 @@ export class PlacesService {
     private httpClient: HttpClient
   ) {}
 
+  fetchPlaces() {
+    return this.httpClient
+      .get<{ [key: string]: Place }>(
+        `${environment.ApiUrl}/offered-places.json`
+      )
+      .pipe(
+        map((resData) => {
+          const places = [];
+          for (const key in resData) {
+            if (resData.hasOwnProperty(key)) {
+              places.push(
+                new Place(
+                  key,
+                  resData[key].title,
+                  resData[key].description,
+                  resData[key].imageUrl,
+                  resData[key].price,
+                  new Date(resData[key].availableFrom),
+                  new Date(resData[key].availableTo),
+                  resData[key].userId
+                )
+              );
+            }
+          }
+          return places;
+        }),
+        tap((places) => {
+          this._places.next(places);
+        })
+      );
+  }
+
   getPlace(id: string) {
     return this.places.pipe(
       take(1),
@@ -95,7 +137,7 @@ export class PlacesService {
       this.authService.userId
     );
     let newPlaceId: string;
-    this.httpClient
+    return this.httpClient
       .post<{ name: string }>(`${environment.ApiUrl}/offered-places.json`, {
         ...newPlace,
         id: null,
@@ -121,12 +163,12 @@ export class PlacesService {
   }
 
   updateOffer(offerId: string, title: string, description: string) {
+    let updatedPlaces: Place[];
     return this.places.pipe(
       take(1),
-      delay(2000),
-      tap((places) => {
+      switchMap((places) => {
         const updatedPlaceIndex = places.findIndex((pl) => pl.id === offerId);
-        const updatedPlaces = [...places];
+        updatedPlaces = [...places];
         const oldPlace = updatedPlaces[updatedPlaceIndex];
         updatedPlaces[updatedPlaceIndex] = new Place(
           oldPlace.id,
@@ -138,13 +180,17 @@ export class PlacesService {
           oldPlace.availableTo,
           oldPlace.userId
         );
+        return this.httpClient.put(
+          `${environment.ApiUrl}/offered-places/${offerId}.json`,
+          {
+            ...updatedPlaces[updatedPlaceIndex],
+            id: null,
+          }
+        );
+      }),
+      tap(() => {
         this._places.next(updatedPlaces);
       })
     );
   }
-}
-function swithMap(
-  arg0: (resData: any) => void
-): import('rxjs').OperatorFunction<{ name: string }, unknown> {
-  throw new Error('Function not implemented.');
 }
