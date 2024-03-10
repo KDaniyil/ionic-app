@@ -7,7 +7,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { IonicModule, LoadingController, NavController } from '@ionic/angular';
+import {
+  AlertController,
+  IonicModule,
+  LoadingController,
+  NavController,
+} from '@ionic/angular';
 import { Place } from '../../place.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlacesService } from '../../places.service';
@@ -23,12 +28,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class EditOfferPage implements OnInit {
   form!: FormGroup;
   place!: Place;
+  isLoading = false;
+  placeId!: string;
   constructor(
     private route: ActivatedRoute,
     private navCtrl: NavController,
     private placesService: PlacesService,
     private router: Router,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private alertController: AlertController
   ) {}
 
   ngOnInit() {
@@ -37,13 +45,36 @@ export class EditOfferPage implements OnInit {
         this.navCtrl.navigateBack('/places/offers');
         return;
       }
+      this.placeId = paramMap.get('placeId')!;
+      this.isLoading = true;
       this.placesService
         .getPlace(paramMap.get('placeId')!)
         .pipe(takeUntilDestroyed())
-        .subscribe((place) => {
-          this.place = place;
-          this.initForm();
-        });
+        .subscribe(
+          (place) => {
+            this.place = place;
+            this.initForm();
+            this.isLoading = false;
+          },
+          (error) => {
+            this.alertController
+              .create({
+                header: 'An error occurred!',
+                message: 'Place could not be fetched. Please try again later.',
+                buttons: [
+                  {
+                    text: 'Okay',
+                    handler: () => {
+                      this.router.navigate(['/places/offers']);
+                    },
+                  },
+                ],
+              })
+              .then((alertEl) => {
+                alertEl.present();
+              });
+          }
+        );
     });
   }
 

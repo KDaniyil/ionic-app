@@ -6,6 +6,7 @@ import {
   Observable,
   delay,
   map,
+  of,
   switchMap,
   take,
   tap,
@@ -102,13 +103,22 @@ export class PlacesService {
   }
 
   getPlace(id: string) {
-    return this.places.pipe(
-      take(1),
-      map((places: Place[]) => {
-        return { ...(this._places.value.find((p) => p.id === id)! as Place) };
-      })
-    );
-    //return { ...(this._places.value.find((p) => p.id === id)! as Place) };
+    return this.httpClient
+      .get<PlaceData>(`${environment.ApiUrl}/offered-places/${id}.json`)
+      .pipe(
+        map((place: PlaceData) => {
+          return new Place(
+            id,
+            place.title,
+            place.description,
+            place.imageUrl,
+            place.price,
+            new Date(place.availableFrom),
+            new Date(place.availableTo),
+            place.userId
+          );
+        })
+      );
   }
 
   /**
@@ -166,6 +176,13 @@ export class PlacesService {
     let updatedPlaces: Place[];
     return this.places.pipe(
       take(1),
+      switchMap((places) => {
+        if (!places || places.length <= 0) {
+          return this.fetchPlaces();
+        } else {
+          return of(places);
+        }
+      }),
       switchMap((places) => {
         const updatedPlaceIndex = places.findIndex((pl) => pl.id === offerId);
         updatedPlaces = [...places];

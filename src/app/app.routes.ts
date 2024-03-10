@@ -45,13 +45,6 @@ export const routes: Routes = [
             (m) => m.EditOfferPage
           ),
       },
-      {
-        path: 'offers/:placeId',
-        loadComponent: () =>
-          import('./places/offers/offer-bookings/offer-bookings.page').then(
-            (m) => m.OfferBookingsPage
-          ),
-      },
     ],
   },
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   ActionSheetController,
+  AlertController,
   IonicModule,
   LoadingController,
   NavController,
@@ -27,6 +28,7 @@ export class PlaceDetailPage implements OnInit {
   place!: Place;
   form!: FormGroup;
   isBookable = false;
+  isLoading = false;
   constructor(
     private router: Router,
     private navCtrl: NavController,
@@ -36,7 +38,8 @@ export class PlaceDetailPage implements OnInit {
     private actionSheetCntrl: ActionSheetController,
     private bookingService: BookingService,
     private loadingCtrl: LoadingController,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertController: AlertController
   ) {}
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
@@ -44,14 +47,36 @@ export class PlaceDetailPage implements OnInit {
         this.navCtrl.navigateBack('/places/discover');
         return;
       }
+      this.isLoading = true;
       const placeId = paramMap.get('placeId');
       this.placesService
         .getPlace(placeId!)
         .pipe(takeUntilDestroyed())
-        .subscribe((place) => {
-          this.place = place;
-          this.isBookable = place.userId !== this.authService.userId;
-        });
+        .subscribe(
+          (place) => {
+            this.place = place;
+            this.isBookable = place.userId !== this.authService.userId;
+            this.isLoading = false;
+          },
+          (error) => {
+            this.alertController
+              .create({
+                header: 'An error occurred!',
+                message: 'Place could not be fetched. Please try again later.',
+                buttons: [
+                  {
+                    text: 'Okay',
+                    handler: () => {
+                      this.router.navigate(['/places/discover']);
+                    },
+                  },
+                ],
+              })
+              .then((alertEl) => {
+                alertEl.present();
+              });
+          }
+        );
     });
   }
 
